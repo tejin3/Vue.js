@@ -1,0 +1,3 @@
+C:\vue\test05>npm install axios
+
+git ignore 뫃듈 안올라가게

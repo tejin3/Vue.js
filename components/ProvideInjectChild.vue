@@ -9,7 +9,7 @@ export default {
     
     // 주는거 받고싶을때 inje
     mounted() {
-        console.log(itmeLength);
+        console.log(this.itmeLength);
     }
 }
 </script>

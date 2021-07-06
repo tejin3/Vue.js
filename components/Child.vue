@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h1>{{fullName}}</h1>
         <button @click="myFunction" ref="btn">클릭</button>
         <!-- id 대신 ref 씀. 유일한 값 -->
     </div>

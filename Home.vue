@@ -8,7 +8,7 @@
 <script>
 // @ is an alias to /src
 import HelloWorld from "@/components/HelloWorld.vue";
-
+// 임폴트에서 골뱅이 최상위로 올라감
 export default {
   name: "Home",
   components: {

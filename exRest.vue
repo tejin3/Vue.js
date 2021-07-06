@@ -4,8 +4,11 @@
 <button 
 :key="menu.menuId" 
 v-for="menu in menus"
-@click="clickMenu1"
+@click="clickMenu()"
+
 >
+<!-- !-- v-bind="{dd: true}"  -->
+<!-- {{}}문자열로 연결 -->
 {{menu.menuName}}<br>
 {{menu.price}}
 </button>
@@ -14,8 +17,10 @@ v-for="menu in menus"
   각종 할인카드 및 쿠폰선택
 </div>
 
+<!-- v--model.number 넘버로 받는다 -->
+<!-- 클릭 이벤트 @="a;b" -->
 <select>
-  <option>할인 카드 선택</option>
+  <option value="0">할인 카드 선택</option>
 <option :key="card.cardId"
 v-for="card in creditCards"
 v-show="card.cardType == 'CREDIT'"
@@ -53,94 +58,94 @@ v-for="coupon in coupons">
 {{coupon.title}}</option>
 </select>
 <div>선택 메뉴 및 수량<br>
-<div v-show="makeMenu1">
+<div v-show="menu1">
   <label>무제한 샐러드바</label>
   <br>
   <label>단품가격</label>
-  <input type="number" readonly value="25000">
+  <input type="number" readonly v-model="count0Basic">
   <label>수량</label>
-  <button>-</button>
-  <input type="number" readonly min=0 value=1>
-  <button>+</button>
+  <button @click="count0Minus">-</button>
+  <input type="number" min=0 v-model="count0">
+  <button @click="count0Plus">+</button>
   <label>합</label>
-  <input type="number" readonly min="0" value="25000">
+  <input type="number" readonly min="0" v-model="count0Sum">
 </div>
-<div v-show="makeMenu2">
+<div v-show="true">
   <label>안심 스테이크(150g)</label>
   <br>
   <label>단품가격</label>
-  <input type="number" readonly value="35500">
+  <input type="number" readonly v-model="count1Basic">
   <label>수량</label>
   <button>-</button>
-  <input type="number" readonly min=0 value=1>
+  <input type="number" readonly min=0 v-model="count1">
   <button>+</button>
   <label>합</label>
-  <input type="number" readonly min="0" value="35500">
+  <input type="number" readonly min="0" v-model="count1Sum">
 </div>
 <div v-show="makeMenu3">
   <label>립아이 스테이크(220g)</label>
   <br>
   <label>단품가격</label>
-    <input type="number" readonly value="22500">
+    <input type="number" v-model="count2Basic">
   <label>수량</label>
   <button>-</button>
-  <input type="number" readonly min=0 value=1>
+  <input type="number" readonly min=0 v-model="count2">
   <button>+</button>
   <label>합</label>
-  <input type="number" readonly min="0" value="22500">
+  <input type="number" readonly min="0" v-model="count2Sum">
 </div>
 <div v-show="makeMenu4">
   <label>채끝 등심 스테이크(210g)</label>
   <br>
   <label>단품가격</label>
-    <input type="number" readonly value="30500">
+    <input type="number" readonly v-model="count3Basic">
   <label>수량</label>
   <button>-</button>
-  <input type="number" readonly min=0 value=1>
+  <input type="number" readonly min=0 v-model="count3">
   <button>+</button>
   <label>합</label>
-  <input type="number" readonly min="0" value="30500">
+  <input type="number" readonly min="0" v-model="count3Sum">
 </div>
 <div v-show="makeMenu5">
   <label>자몽에이드</label>
   <br>
   <label>단품가격</label>
-    <input type="number" readonly value="6500">
+    <input type="number" readonly v-model="count4Basic">
   <label>수량</label>
   <button>-</button>
-  <input type="number" readonly min=0 value=1>
+  <input type="number" readonly min=0 v-model="count4">
   <button>+</button>
   <label>합</label>
-  <input type="number" readonly min="0" value="6500">
+  <input type="number" readonly min="0" v-model="count4Sum">
 </div>
 <div v-show="makeMenu6">
   <label>애플망고에이드</label>
   <br>
   <label>단품가격</label>
-    <input type="number" readonly value="6500">
+    <input type="number" readonly v-model="count5Basic">
   <label>수량</label>
   <button>-</button>
-  <input type="number" readonly min=0 value=1>
+  <input type="number" readonly min=0 v-model="count5">
   <button>+</button>
   <label>합</label>
-  <input type="number" readonly min="0" value="6500">
+  <input type="number" readonly min="0" v-model="count5Sum">
 </div>
 <div v-show="makeMenu7">
   <label>생맥주</label>
   <br>
   <label>단품가격</label>
-   <input type="number" readonly value="400">
+   <input type="number" readonly v-model="count6Basic">
   <label>수량</label>
   <button>-</button>
-  <input type="number" readonly min=0 value=1>
+  <input type="number" readonly min=0 v-model="count6">
   <button>+</button>
   <label>합</label>
-  <input type="number" readonly min="0" value="400">
+  <input type="number" readonly min="0" v-model="count6Sum">
 </div>
   
   
 </div>
-<div>할인 미적용 요금</div>
+<div>할인 미적용 요금 <input type="number" readonly v-model="noCutFee" ></div>
 <button>최종 요금 계산</button>
 <div>최종요금</div>
   </div>
@@ -151,6 +156,28 @@ export default {
   components: {},
   data() {
     return {
+    // dd: false,
+    count0Basic: 25000,
+    count1Basic: 35500,
+    count2Basic: 22500,
+    count3Basic: 30500,
+    count4Basic: 6500,
+    count5Basic: 6500,
+    count6Basic: 400,
+
+    count0: 1,
+    count1: 1,
+    count2: 1,
+    count3: 1,
+    count4: 1,
+    count5: 1,
+    count6: 1,
+
+
+    
+
+    menu1: true,
+
       makeMenu1: false,
       makeMenu2: false,
       makeMenu3: false,
@@ -158,9 +185,7 @@ export default {
       makeMenu5: false,
       makeMenu6: false,
       makeMenu7: false,
-
       
-
       menus: [{
         menuId: 1,
         menuName: "무제한 샐러드바",
@@ -197,7 +222,6 @@ export default {
         price: 400
       }
     ],
-
     //할인 종류
     cardTypes:  [{
         cardType: "CREDIT",
@@ -216,7 +240,6 @@ export default {
         title: "포인트결제"
       }
     ],
-
     //할인 카드/통신사/포인트/OK캐시백
     creditCards: [{
         cardId: 1,
@@ -380,7 +403,6 @@ export default {
         discountType: "%"
       }
     ],
-
     //할인쿠폰
     coupons: [{
         couponId: 1,
@@ -469,23 +491,67 @@ export default {
     ],
     };
   },
+  computed:{
+  count0Sum(){
+      return this.count0 * this.count0Basic;
+  },
+count1Sum(){
+      return this.count1 * this.count1Basic;
+  },
+  count2Sum(){
+      return this.count2 * this.count2Basic;
+  },
+  count3Sum(){
+      return this.count3 * this.count3Basic;
+  },
+  count4Sum(){
+      return this.count4 * this.count4Basic;
+  },
+  count5Sum(){
+      return this.count5 * this.count5Basic;
+  },
+  count6Sum(){
+      return this.count6* this.count6Basic;
+  },
+
+
+  noCutFee(){
+      return this.count0Sum + this.count1Sum + this.count2Sum +this.count3Sum +this.count4Sum +this.count5Sum + this.count6Sum;
+  },
+  },
   setup() {},
-  created() {},
-  mounted() {},
+  created() {
+    //먼저  시작
+  },
+  mounted() {
+      //마지막에
+  },
   unmounted() {},
   methods: {
-    clickMenu1() {
+    clickMenu() {
      
-      this.makeMenu1 = true
+    //   this.makeMenu1 = true
     },
     clickMenu(id) {
       console.log(id)
      
     },
-      
+    count0Minus(){
+        if(this.count0 < 1) {
+            this.menu1 = false
+        } else {
+        this.count0 -= 1
 
+        }
+    },
+
+    count0Plus(){
+        
+        this.count0 += 1
+        },
   
-
+      
+  
   }
 }
 </script>

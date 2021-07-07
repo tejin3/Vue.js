@@ -1,23 +1,24 @@
 <template>
-    <div><h1>helloWorld {{title1}}</h1></div>
-
-    <!-- <div><h1>hello{{title2}}</h1></div> -->
+  <div>
+    <h1>데이터 바인딩</h1>
+    <div>aa</div>
+    <!-- <button @click="$hello">믹스인</button> -->
+  </div>
 </template>
 <script>
 export default {
-    name: "",
-    components: {},
-    data() {
-        return {
-            title1: "world",
-            title2: "jeremy"
-
-        };
-    },
-    setup() {},
-    created() {},
-    mounted() {},
-    unmounted() {},
-    methods: {}
-}
+  name: "",
+  components: {},
+  //   mixins: [ApiMixin],
+  data() {
+    return {
+      sampleData: "",
+    };
+  },
+  setup() {},
+  created() {},
+  mounted() {},
+  unmounted() {},
+  methods: {},
+};
 </script>

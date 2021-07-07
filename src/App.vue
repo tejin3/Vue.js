@@ -1,11 +1,19 @@
 <template>
+<Header />
   <div id="nav">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>|
-    <router-link to="/databinding">databinding</router-link>|
-    <router-link to="/databindinghtml">DatabindingHtml</router-link>|
-    <router-link to="/databindinginputtext">databindinginputtext</router-link>|
-    <router-link to="/databindingselect">DataBindingSelect</router-link>
+    <router-link to="/about">About</router-link> |
+    <router-link to="/databinding">DataBinding</router-link> |
+    <router-link to="/DataBindingList">DataBindingList</router-link> |
+    <router-link to="/DataBindingList2">DataBindingList2</router-link> |
+    <router-link to="/Renderingif">Renderingif</router-link> |
+    <router-link to="/EventBinding">EventBinding</router-link> |
+    <router-link to="/exBending">exBending</router-link> |
+    <router-link to="/exRest">exRest</router-link>|
+    <router-link to="/Computed">Computed</router-link>|
+    <router-link to="/Watch">Watch</router-link>
+
+
 
 
 
@@ -13,7 +21,12 @@
   </div>
   <router-view />
 </template>
-
+<script>
+import Header from "./components/Header.vue"
+export default {
+  components: {Header},
+};
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

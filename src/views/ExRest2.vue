@@ -9,18 +9,20 @@
       {{ menu.menuName }}<br />가격 : {{ menu.price }}원
     </button>
     <br />
-    <br /><br />
+
     <div>
-      선택 메뉴 및 수량<br /><br />
+      <p>선택 메뉴 및 수량</p>
+
       <div
         :key="selectmenu.menuId"
         v-for="selectmenu in menus.filter((m) => m.isSelected)"
       >
-        <label>{{ selectmenu.menuName }} - </label>
+        <label>{{ selectmenu.menuName }}</label>
 
-        <label> 단품 가격 : {{ selectmenu.price }}원 </label>
+        <label> 단품 가격 : {{ selectmenu.price }}원 </label><br />
         <label> 수량 </label>
         <button
+          style="width: 5%"
           @click="
             selectmenu.qty < 1
               ? ((selectmenu.isSelected = false), (selectmenu.qty = 1))
@@ -30,15 +32,18 @@
           -
         </button>
         <input type="number" min="0" readonly v-model="selectmenu.qty" />
-        <button @click="selectmenu.qty++">+</button>
-        <button @click="(selectmenu.isSelected = false), (selectmenu.qty = 1)">
+        <button style="width: 5%" @click="selectmenu.qty++">+</button>
+        <button
+          style="width: 10%"
+          @click="(selectmenu.isSelected = false), (selectmenu.qty = 1)"
+        >
           삭제
         </button>
         <label> 합 : {{ selectmenu.qty * selectmenu.price }}</label>
       </div>
-      <br />
+
       <div>
-        할인 미적용 요금
+        <p>할인 미적용 요금</p>
         <p>{{ total }}</p>
       </div>
       <div>
@@ -92,7 +97,14 @@
         </select>
       </div>
       <div>
+        <br />
         <button
+          style="
+            height: 50px;
+            background-color: black;
+            color: white;
+            font-size: 20px;
+          "
           @click="
             lastFee();
             feeMake = true;
@@ -108,6 +120,7 @@
         <label>최종 결제 금액</label>
         <input type="number" readonly v-model="fee" />
       </div>
+      <br /><br /><br />
     </div>
   </div>
 </template>
@@ -472,23 +485,30 @@ export default {
       console.log("통신사", this.selectedTelecom);
       console.log("오케이", this.selectedOkcashbag);
       console.log("포인트", this.selectedPoint);
-
       this.highDisCount = Math.max(
         this.selectedCredit,
         this.selectedTelecom,
         this.selectedOkcashbag,
         this.selectedPoint
       );
-
       console.log("가장높은 할인율2", this.highDisCount);
       console.log("헬로");
       this.discountSum = this.noCutFee * (this.highDisCount / 100);
       console.log("카드할인비용", this.discountSum);
       console.log("선택한 쿠폰 아이디", this.selectedCoupon);
-
       // 이게 위로 가야함
       for (var coupon of this.coupons) {
-        if (coupon.couponId == this.selectedCoupon) {
+        if (this.selectedCoupon == 0) {
+          //쿠폰이 선택되지 않았을때
+          console.log("쿠폰이 선택되지 않았을 때");
+          console.log("포문돌린 쿠폰아이디", coupon.couponId);
+          console.log("선택한 쿠폰아이디", this.selectedCoupon);
+          this.discountSum = this.noCutFee * (this.highDisCount / 100);
+          return (
+            (this.fee = this.noCutFee - this.discountSum),
+            (this.allDis = this.total - this.fee)
+          );
+        } else if (coupon.couponId == this.selectedCoupon) {
           //쿠폰을 선택했을 때
           console.log("포문돌린 쿠폰아이디", coupon.couponId);
           console.log("선택한 쿠폰아이디", this.selectedCoupon);
@@ -533,9 +553,16 @@ export default {
             } //여기까진 맞음
           } else {
             //중복할인이 되지 않을 때
+            console.log("중복할인이 되지 않을 때");
+
             if (coupon.discount < 100) {
+              //쿠폰이 퍼센트로 깍을때
+              console.log("쿠폰이 퍼센트로 깍을때");
+
               if (coupon.discount >= this.highDisCount) {
                 //쿠폰 할인이 더 클때
+                console.log("쿠폰 할인이 더 클때");
+
                 this.discountSum = this.noCutFee * (coupon.discount / 100);
                 return (
                   (this.fee = this.noCutFee - this.discountSum),
@@ -543,6 +570,8 @@ export default {
                 );
               } else {
                 //카드 할인이 더 클때
+                console.log("카드 할인이 더 클때");
+
                 this.discountSum = this.noCutFee * (this.highDisCount / 100);
                 return (
                   (this.fee = this.noCutFee - this.discountSum),
@@ -550,16 +579,37 @@ export default {
                 );
               }
             } else {
+              //쿠폰이 마이너스로 깍을때
+              console.log("쿠폰이 마이너스로 깍을 때");
+
               if (
                 this.noCutFee - coupon.discount >=
                 this.noCutFee * (this.highDisCount / 100)
               ) {
+                //쿠폰 할인 가격이 카드 할인 가격보다 클 때
+                console.log("쿠폰할인 가격이 카드 할인 가격보다 클 때");
+
+                this.discountSum = this.noCutFee - coupon.discount;
+                console.log(this.discountSum);
+                return (
+                  (this.fee = this.noCutFee - this.discountSum),
+                  (this.allDis = this.total - this.fee)
+                );
+              } else {
+                //쿠폰 할인 가격이 카드 할인 가격보다 작을 때
+                console.log("쿠폰할인 가격이 카드 할인 가격보다 작을 때");
+
+                this.discountSum = this.noCutFee * (this.highDisCount / 100);
+                return (
+                  (this.fee = this.noCutFee - this.discountSum),
+                  (this.allDis = this.total - this.fee)
+                );
               }
-              //쿠폰 할인 가격이 카드 할인 가격보다 클 때
             }
           }
         }
       }
+
       //     if (coupon.discount < 100) {
       //       this.discountSum = this.noCutFee * (coupon.discount / 100);
       //       this.discountSum =
@@ -587,3 +637,26 @@ export default {
   },
 };
 </script>
+<style scoped>
+div {
+  background-color: rgb(85, 84, 84);
+}
+button {
+  margin: 5px;
+  width: 30%;
+}
+select {
+  width: 70%;
+  font-size: 15px;
+}
+label {
+  background-color: rgb(219, 202, 172);
+  margin: 5px;
+  padding: 2px;
+}
+p {
+  background-color: rgb(58, 58, 58);
+  color: white;
+  font-size: 20px;
+}
+</style>

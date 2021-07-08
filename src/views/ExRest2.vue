@@ -46,7 +46,7 @@
           <option value="0">할인 카드 선택</option>
           <option
             :key="card.cardId"
-            value="{{card.discount}}"
+            :value="card.discount"
             v-for="card in creditCards.filter((m) => m.cardType == 'CREDIT')"
           >
             {{ card.cardName }}
@@ -56,6 +56,7 @@
           <option value="0">통신사 할인 선택</option>
           <option
             :key="card.cardId"
+            :value="card.discount"
             v-for="card in creditCards.filter((m) => m.cardType == 'TELECOM')"
           >
             {{ card.cardName }}
@@ -64,6 +65,7 @@
           <option value="0">OKCASHBAG 할인 선택</option>
           <option
             :key="card.cardId"
+            :value="card.discount"
             v-for="card in creditCards.filter((m) => m.cardType == 'OKCASHBAG')"
           >
             {{ card.cardName }}
@@ -72,14 +74,19 @@
           <option value="0">POINT결제 선택</option>
           <option
             :key="card.cardId"
+            :value="card.discount"
             v-for="card in creditCards.filter((m) => m.cardType == 'POINT')"
           >
             {{ card.cardName }}
           </option>
         </select>
-        <select>
-          <option>쿠폰 할인 선택</option>
-          <option :key="coupon.couponId" v-for="coupon in coupons">
+        <select v-model.number="selectedCoupon">
+          <option value="0">쿠폰 할인 선택</option>
+          <option
+            :key="coupon.couponId"
+            :value="coupon.couponId"
+            v-for="coupon in coupons"
+          >
             {{ coupon.title }}
           </option>
         </select>
@@ -95,6 +102,10 @@
         ><br />
       </div>
       <div v-show="feeMake">
+        <label>할인금액 </label>
+        <input type="number" readonly v-model="allDis" />
+
+        <label>최종 결제 금액</label>
         <input type="number" readonly v-model="fee" />
       </div>
     </div>
@@ -109,11 +120,13 @@ export default {
       selectedTelecom: 0,
       selectedOkcashbag: 0,
       selectedPoint: 0,
+      selectedCoupon: 0,
       noCutFee: 0,
       discountSum: 0,
+      allDis: 0,
+      highDisCount: 0,
       feeMake: false,
       fee: 0,
-
       menus: [
         {
           menuId: 1,
@@ -434,15 +447,6 @@ export default {
       this.noCutFee = sum;
       return sum;
     },
-    // discount() {
-    //   this.discountSum =
-    //     Math.max(
-    //       this.selectedCredit,
-    //       this.selectedTelecom,
-    //       this.selectedOkcashbag,
-    //       this.selectedPoint
-    //     ) * this.total;
-    // },
   },
   setup() {},
   created() {
@@ -456,7 +460,6 @@ export default {
       };
     });
   },
-
   mounted() {
     console.table(this.menus);
   },
@@ -464,7 +467,122 @@ export default {
   unmounted() {},
   methods: {
     lastFee() {
+      console.log("가장높은 할인율1", this.highDisCount);
+      console.log("카드", this.selectedCredit);
+      console.log("통신사", this.selectedTelecom);
+      console.log("오케이", this.selectedOkcashbag);
+      console.log("포인트", this.selectedPoint);
+
+      this.highDisCount = Math.max(
+        this.selectedCredit,
+        this.selectedTelecom,
+        this.selectedOkcashbag,
+        this.selectedPoint
+      );
+
+      console.log("가장높은 할인율2", this.highDisCount);
       console.log("헬로");
+      this.discountSum = this.noCutFee * (this.highDisCount / 100);
+      console.log("카드할인비용", this.discountSum);
+      console.log("선택한 쿠폰 아이디", this.selectedCoupon);
+
+      // 이게 위로 가야함
+      for (var coupon of this.coupons) {
+        if (coupon.couponId == this.selectedCoupon) {
+          //쿠폰을 선택했을 때
+          console.log("포문돌린 쿠폰아이디", coupon.couponId);
+          console.log("선택한 쿠폰아이디", this.selectedCoupon);
+          if (coupon.doubleDiscount == true) {
+            console.log("쿠폰 할인가격", coupon.discount);
+            //쿠폰이 중복할인 가능하면
+            if (coupon.discount < 100) {
+              //쿠폰이 퍼센테이지로 가격 할인을 하면
+              this.discountSum = this.noCutFee * (coupon.discount / 100);
+              console.log("1", this.discountSum);
+              //쿠폰 할인 가격 구하기
+              this.noCutFee -= this.discountSum;
+              //할인 미적용 요금에서 쿠폰 할인 가격 빼기
+              this.discountSum =
+                this.highDisCount == 0
+                  ? this.discountSum
+                  : //제일 할인율 높은 카드가 0 이라면 변화 없음
+                    this.noCutFee * (this.highDisCount / 100);
+              //제일 할인율 높은 카드가 0이 아니라면 기존 요금에서 쿠폰 할인가격을 빼고 그걸 쿠폰 할인율로
+              return (
+                (this.fee = this.noCutFee - this.discountSum),
+                (this.allDis = this.total - this.fee)
+              );
+            } else {
+              //쿠폰이 마이너스로 가격 할인
+              console.log(coupon.discount);
+              this.discountSum = coupon.discount;
+              console.log("2", this.discountSum);
+              //쿠폰 할인 가격 구하기
+              this.noCutFee -= this.discountSum;
+              //할인 미적용 요금에서 쿠폰 할인 가격 빼기
+              this.discountSum =
+                this.highDisCount == 0
+                  ? this.discountSum
+                  : //제일 할인율 높은 카드가 0 이라면 변화 없음
+                    this.noCutFee * (this.highDisCount / 100);
+              //제일 할인율 높은 카드가 0이 아니라면 기존 요금에서 쿠폰 할인가격을 빼고 그걸 쿠폰 할인율로
+              return (
+                (this.fee = this.noCutFee - this.discountSum),
+                (this.allDis = this.total - this.fee)
+              );
+            } //여기까진 맞음
+          } else {
+            //중복할인이 되지 않을 때
+            if (coupon.discount < 100) {
+              if (coupon.discount >= this.highDisCount) {
+                //쿠폰 할인이 더 클때
+                this.discountSum = this.noCutFee * (coupon.discount / 100);
+                return (
+                  (this.fee = this.noCutFee - this.discountSum),
+                  (this.allDis = this.total - this.fee)
+                );
+              } else {
+                //카드 할인이 더 클때
+                this.discountSum = this.noCutFee * (this.highDisCount / 100);
+                return (
+                  (this.fee = this.noCutFee - this.discountSum),
+                  (this.allDis = this.total - this.fee)
+                );
+              }
+            } else {
+              if (
+                this.noCutFee - coupon.discount >=
+                this.noCutFee * (this.highDisCount / 100)
+              ) {
+              }
+              //쿠폰 할인 가격이 카드 할인 가격보다 클 때
+            }
+          }
+        }
+      }
+      //     if (coupon.discount < 100) {
+      //       this.discountSum = this.noCutFee * (coupon.discount / 100);
+      //       this.discountSum =
+      //         this.highDisCount == 0
+      //           ? this.discountSum
+      //           : this.discountSum * (this.highDisCount / 100);
+      //       return (this.fee = this.noCutFee - this.discountSum);
+      //     } else {
+      //       this.discountSum = this.noCutFee - coupon.discount;
+      //       this.discountSum =
+      //         this.highDisCount == 0
+      //           ? this.discountSum
+      //           : this.discountSum * (this.highDisCount / 100);
+      //       return (this.fee = this.noCutFee - this.discountSum);
+      //     }
+      //   } else {
+      //     this.discountSum =
+      //       this.highDisCount == 0
+      //         ? this.discountSum
+      //         : this.discountSum * (this.highDisCount / 100);
+      //     return (this.fee = this.noCutFee - this.discountSum);
+      //   }
+      // }
     },
   },
 };
